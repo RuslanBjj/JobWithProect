@@ -198,8 +198,35 @@ new Karta (
 ).plusKart();
  
         // ----------------------------------------------------------------
+const forms = document.querySelectorAll('form');
+forms.forEach(item=>{
+postData(item);
+});
 
-        
+function postData(form) {
+    form.addEventListener('submit',(e)=>{
+            e.preventDefault();
+        const request = new XMLHttpRequest();
+        request.open('POST','js/server.php');
+        request.setRequestHeader('Content-type', 'application/json');
+
+        const formaData = new FormData(form);
+         const object = {};
+         formaData.forEach(function(key,val){
+            object[val]=key;
+         });
+ const json = JSON.stringify(object);
+
+        request.send(json);
+      
+       request.addEventListener('load',()=>{
+if(request.status === 200) { console.log(request.response);}
+       });
+    });
+}
+
+
+// ------------------------------------------------------------        
 });
 // ----------------------------------------------
 
