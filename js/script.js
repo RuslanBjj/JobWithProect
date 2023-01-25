@@ -118,7 +118,7 @@ setTime('.timer',finishDate);
 
         const callWhithUs = document.querySelectorAll('[data-mod]');
         const modalWind = document.querySelector('.modal');
-        const modalClose = document.querySelector('[data-close]');
+     
         // --------------------------------------------------------------
  function closeOkno () {
             modalWind.style.display="none";
@@ -133,12 +133,15 @@ function showOkno (){
             showOkno();
 });
         });
-modalClose.addEventListener('click',()=>{ 
-    closeOkno();   });
+
  document.addEventListener('keydown',(e)=>{
         if (e.code==="Escape") {
     closeOkno();
 }    
+        });
+        modalWind.addEventListener('click',(e)=>{
+      if (e.target===modalWind || e.target.getAttribute('data-close')=='')
+      {closeOkno();}
         });
 
       
@@ -198,35 +201,112 @@ new Karta (
 ).plusKart();
  
         // ----------------------------------------------------------------
+// const forms = document.querySelectorAll('form');
+// forms.forEach(item=>{
+// postData(item);
+// });
+
+// function postData(form) {
+//     form.addEventListener('submit',(e)=>{
+//             e.preventDefault();
+//         const request = new XMLHttpRequest();
+//         request.open('POST','js/server.php');
+//         request.setRequestHeader('Content-type', 'application/json');
+
+//         const formaData = new FormData(form);
+//          const object = {};
+//          formaData.forEach(function(key,val){
+//             object[val]=key;
+//          });
+//  const json = JSON.stringify(object);
+
+//         request.send(json);
+      
+//        request.addEventListener('load',()=>{
+// if(request.status === 200) { console.log(request.response);}
+//        });
+//     });
+// }
+
 const forms = document.querySelectorAll('form');
-forms.forEach(item=>{
-postData(item);
+    const messange ={
+        loading:'img/okno/spiner.svg',
+        success:'Спасибо мы с вами свяжемся',
+        failure:'Что то пошло  не так'
+     };
+    forms.forEach(item=>{
+        postData(item);
+     });
+function postData(form){
+    form.addEventListener('submit',(e)=>{
+    e.preventDefault();
+        const statusMessage = document.createElement('img');
+                statusMessage.src = messange.loading;
+                statusMessage.style.cssText = `
+                display:block;
+                margin: 0 auto;
+                `;
+ form.append(statusMessage);
+
+           
+const formaData = new FormData(form);
+
+const obj = {};
+        formaData.forEach(function(val,key){
+        obj[key]=val;
+    });
+
+
+fetch('js/server.php',{
+    method:'POST',
+    headers:{ 
+        'Content-type': 'application/json'
+    },
+    body:JSON.stringify(obj)
+}).then(data=>data.text())
+.then(data=>{
+    console.log(data);
+    showThanksModal( messange.success);
+    statusMessage.remove();
+    form.reset();
+}).catch(()=>{
+    showThanksModal( messange.failure);
 });
 
-function postData(form) {
-    form.addEventListener('submit',(e)=>{
-            e.preventDefault();
-        const request = new XMLHttpRequest();
-        request.open('POST','js/server.php');
-        request.setRequestHeader('Content-type', 'application/json');
 
-        const formaData = new FormData(form);
-         const object = {};
-         formaData.forEach(function(key,val){
-            object[val]=key;
-         });
- const json = JSON.stringify(object);
-
-        request.send(json);
-      
-       request.addEventListener('load',()=>{
-if(request.status === 200) { console.log(request.response);}
-       });
+        
     });
+
 }
+// ---------------------------------------------------
 
+function showThanksModal (messange) {
+    const prevModalDialog = document.querySelector('.modal__dialog');
+    prevModalDialog.style.display="none";
+    showOkno();
 
+    const thanksModal = document.createElement('div');
+    thanksModal.classList.add('modal__dialog');
+    thanksModal.innerHTML=` <div class="modal__content">
+    <div data-close class ="modal__close ">&times;</div>
+    <div class="modal__title">${messange}</div>
+    </div>`;
+document.querySelector('.modal').append(thanksModal);
+setTimeout(()=>{
+thanksModal.remove();
+prevModalDialog.style.display="block";
+closeOkno();
+},3000);
+}
 // ------------------------------------------------------------        
+
+
+   
+// ------------------------------------------------------------------
+
+// ------------------------------------------------------------------
+
+// ------------------------------------------------------------------
 });
 // ----------------------------------------------
 
